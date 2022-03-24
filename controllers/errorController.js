@@ -37,50 +37,89 @@ const sendErrorDev = (err, res) => {
   });
 };
 
-const sendErrorProd = (err, res) => {
-  // Operational, trusted error: send message to client
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message
-    });
+// const sendErrorProd = (err, res) => {
 
-    // Programming or other unknown error: don't leak error details
-  } else {
+
+
+  const sendErrorProd = (err, req, res) => {
+    // A) API
+    if (req.originalUrl.startsWith('/api')) {
+      // A) Operational, trusted error: send message to client
+      if (err.isOperational) {
+        return res.status(err.statusCode).json({
+          status: err.status,
+          message: err.message
+        });
+      }
+      // B) Programming or other unknown error: don't leak error details
+      // 1) Log error
+      console.error('ERROR 💥', err);
+      // 2) Send generic message
+      return res.status(500).json({
+        status: 'error',
+        message: 'Something went very wrong!'
+      });
+    }
+  
+    // B) RENDERED WEBSITE
+    // A) Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).render('error', {
+        title: 'Something went wrong!',
+        msg: err.message
+      });
+    }
+    // B) Programming or other unknown error: don't leak error details
     // 1) Log error
-    console.error('ERROR ', err);
-
+    console.error('ERROR 💥', err);
     // 2) Send generic message
-
-    res.status(500).json({
-      status: 'error',
-      message: 'Something went very wrong!'
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: 'Please try again later.'
     });
-  }
-};
+  };
+
+
+//   // Operational, trusted error: send message to client
+//   if (err.isOperational) {
+//     res.status(err.statusCode).json({
+//       status: err.status,
+//       message: err.message
+//     });
+
+//     // Programming or other unknown error: don't leak error details
+//   } else {
+//     // 1) Log error
+//     console.error('ERROR ', err);
+
+//     // 2) Send generic message
+
+//     res.status(500).json({
+//       status: 'error',
+//       message: 'Something went very wrong!'
+//     });
+//   }
+// };
 
 module.exports = (err, req, res, next) => {
+  // console.log(err.stack);
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    //console.log('hello from error dev');
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
-    //console.log('hello from error prod');
-    // Create a hardcopy of the error
-    sendErrorDev(err, res);
     let error = { ...err };
-    // console.log(error);
-    // example: 127.0.0.1:4000/api/v1/posts/wwwwwwww
-    if (err.name === 'CastError') error = handleCastErrorDB(error);
-    // Example: if we are trying to create an post and duplicate a field that we specified it to be unique in the schema
-    if (err.code === 11000) error = handleDuplicateFieldsDB(error);
-    // Example: if we are trying to assign a field with a value that is not accepted by the validators
-    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
-    if (err.name === 'JsonWebTokenError') error = handleJWTError();
+    error.message = err.message;
+
+    if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
-    sendErrorProd(error, res);
-    
+
+    sendErrorProd(error, req, res);
   }
 };
