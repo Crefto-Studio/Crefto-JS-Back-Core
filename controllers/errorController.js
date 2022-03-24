@@ -64,10 +64,10 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    console.log('hello from error dev');
+    //console.log('hello from error dev');
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    console.log('hello from error prod');
+    //console.log('hello from error prod');
     // Create a hardcopy of the error
     let error = { ...err };
     // console.log(error);

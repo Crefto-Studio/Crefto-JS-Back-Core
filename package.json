@@ -47,5 +47,13 @@
   },
   "engines": {
     "node": ">=10.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://mohamedrazzk@github.com/MohamedRazzk/Crefto-JS-Back-Core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MohamedRazzk/Crefto-JS-Back-Core/issues"
+  },
+  "homepage": "https://github.com/MohamedRazzk/Crefto-JS-Back-Core#readme"
 }

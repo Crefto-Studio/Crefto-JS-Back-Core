@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const compression = require('compression'); 
 
 const postRouter = require('./routes/postRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -46,6 +47,9 @@ app.use(xss());
 app.use(hpp());
 // In this middleware the data from the body is added to the request (req.body becomes available)
 app.use(express.json());
+
+//compression 
+app.use(compression())
 
 // Add the current time to the request by defining a property requestTime on the request, toISOString is a date function that converts it to a readable string
 app.use((req, res, next) => {
