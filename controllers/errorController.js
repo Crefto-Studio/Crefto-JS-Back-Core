@@ -69,6 +69,7 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     //console.log('hello from error prod');
     // Create a hardcopy of the error
+    sendErrorDev(err, res);
     let error = { ...err };
     // console.log(error);
     // example: 127.0.0.1:4000/api/v1/posts/wwwwwwww
@@ -80,5 +81,6 @@ module.exports = (err, req, res, next) => {
     if (err.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
     sendErrorProd(error, res);
+    
   }
 };
