@@ -105,3 +105,6 @@ dist
 
 #ignore configre enviroment file 
 *.env
+
+.eslintrc.json
+.prettierrc
