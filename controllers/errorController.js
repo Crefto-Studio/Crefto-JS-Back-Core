@@ -16,6 +16,8 @@ const handleDuplicateFieldsDB = err => {
 };
 
 const handleValidationErrorDB = err => {
+  // console.log('vvvvvvvvvvvvvvvvv');
+  // console.log(err);
   const errors = Object.values(err.errors).map(el => el.message);
 
   const message = `Invalid input data. ${errors.join('. ')}`;
@@ -39,46 +41,43 @@ const sendErrorDev = (err, res) => {
 
 // const sendErrorProd = (err, res) => {
 
-
-
-  const sendErrorProd = (err, req, res) => {
-    // A) API
-    if (req.originalUrl.startsWith('/api')) {
-      // A) Operational, trusted error: send message to client
-      if (err.isOperational) {
-        return res.status(err.statusCode).json({
-          status: err.status,
-          message: err.message
-        });
-      }
-      // B) Programming or other unknown error: don't leak error details
-      // 1) Log error
-      console.error('ERROR 💥', err);
-      // 2) Send generic message
-      return res.status(500).json({
-        status: 'error',
-        message: 'Something went very wrong!'
-      });
-    }
-  
-    // B) RENDERED WEBSITE
+const sendErrorProd = (err, req, res) => {
+  // A) API
+  if (req.originalUrl.startsWith('/api')) {
     // A) Operational, trusted error: send message to client
     if (err.isOperational) {
-      return res.status(err.statusCode).render('error', {
-        title: 'Something went wrong!',
-        msg: err.message
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
       });
     }
     // B) Programming or other unknown error: don't leak error details
     // 1) Log error
     console.error('ERROR 💥', err);
     // 2) Send generic message
+    return res.status(500).json({
+      status: 'error',
+      message: 'Something went very wrong!'
+    });
+  }
+
+  // B) RENDERED WEBSITE
+  // A) Operational, trusted error: send message to client
+  if (err.isOperational) {
     return res.status(err.statusCode).render('error', {
       title: 'Something went wrong!',
-      msg: 'Please try again later.'
+      msg: err.message
     });
-  };
-
+  }
+  // B) Programming or other unknown error: don't leak error details
+  // 1) Log error
+  console.error('ERROR 💥', err);
+  // 2) Send generic message
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please try again later.'
+  });
+};
 
 //   // Operational, trusted error: send message to client
 //   if (err.isOperational) {
@@ -108,15 +107,16 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, req, res);
+    // console.log('hi from deeeeeeeeeeeeev');
+    sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
+    // console.log('hi from production');
     let error = { ...err };
     error.message = err.message;
 
-    if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (err.name === 'CastError') error = handleCastErrorDB(error); //check err.name not error.name
     if (error.code === 11000) error = handleDuplicateFieldsDB(err); //send err not error
-    if (error.name === 'ValidationError')
-      error = handleValidationErrorDB(error);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(error); //check err.name not error.name
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
