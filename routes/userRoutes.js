@@ -1,4 +1,7 @@
 const express = require('express');
+var bodyParser = require('body-parser')
+var urlencodedParser = bodyParser.urlencoded({ extended: false})
+
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 
@@ -10,6 +13,14 @@ router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
+
+router.get('/resetPassword/:token', (req, res) => {
+  res.status(200).render('reset',{ token:req.params.token});
+});
+
+
+router.post('/resetPassword/:token',urlencodedParser,authController.resetPassword);
+
 
 router.get(
   '/me',

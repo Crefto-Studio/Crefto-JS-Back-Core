@@ -13,9 +13,12 @@ const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
+var bodyParser = require('body-parser')
+
+
 // Express is a function which add a bunch of methods to our app variable
 const app = express();
-app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 // Serve static files in public folder(ex: home.html)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -65,18 +68,31 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
 // ================================================================================================
 //                                 2) Routes
 // ================================================================================================
 
 app.get('/', (req, res) => {
-  res.status(200).render('base');
+  res.redirect(301,'http://crefto.studio/');
 });
+
+
 
 // Mount postRouter to that route
 app.use('/api/v1/posts', postRouter);
 // Mount userRouter to that route
 app.use('/api/v1/users', userRouter);
+
+
+//404 
+app.use((req, res)=>{
+  res.redirect(301,'http://crefto.studio/');
+})
+
+
+
 
 // =========================================================================================
 //                                 4) Error handling middlewares

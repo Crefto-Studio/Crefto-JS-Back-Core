@@ -185,6 +185,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 //////////////////////////////////////////////////////////  resetPassword ////////////////////////////////////////////
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
+  // console.log("im here")
+  // console.log(req.body)
+  // console.log(req.params.token)
+  
+
   const hashedToken = crypto
     .createHash('sha256')
     .update(req.params.token)
@@ -197,7 +202,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // console.log(user);
   // 2) If token has not expired, and there is user, set the new password
   if (!user) {
-    return next(new AppError('Token is invalid or has expired', 400));
+    // return next(new AppError('Token is invalid or has expired', 400));
+    res.status(200).render('ews',{ stat:false})
+    return 0 ;
   }
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
@@ -208,11 +215,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 4) Log the user in, send JWT
   const token = signToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-
-    token
-  });
+  res.status(200).render('ews',{ stat:true});
 });
 /////////////////////////////////////////// update password /////////////////////////////////////////////////////////
 exports.updatePassword = catchAsync(async (req, res, next) => {
