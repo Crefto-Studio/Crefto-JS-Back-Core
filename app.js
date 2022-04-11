@@ -13,15 +13,11 @@ const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
-var bodyParser = require('body-parser')
-
 
 // Express is a function which add a bunch of methods to our app variable
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// Serve static files in public folder(ex: home.html)
-app.use(express.static(path.join(__dirname, 'public')));
 
 // ================================================================================================
 //                                 1) Middlewares
@@ -38,6 +34,7 @@ const limiter = rateLimit({
   windowMS: 60 * 60 * 1000,
   message: 'To manny request from this ip, please try again later'
 });
+
 app.use('/api/', limiter);
 //set security http requist
 app.use(helmet());
@@ -69,6 +66,16 @@ app.use((req, res, next) => {
 });
 
 
+// Serve static files in public folder(ex: home.html)
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/css',express.static(path.join(__dirname, 'public/css')));
+app.use('/fonts',express.static(path.join(__dirname, 'public/fonts')));
+app.use('/js',express.static(path.join(__dirname, 'public/js')));
+app.use('/vendor',express.static(path.join(__dirname, 'public/vendor')));
+app.use('/images',express.static(path.join(__dirname, 'public/images')));
+
+
+
 
 // ================================================================================================
 //                                 2) Routes
@@ -78,20 +85,15 @@ app.get('/', (req, res) => {
   res.redirect(301,'http://crefto.studio/');
 });
 
-
-
 // Mount postRouter to that route
 app.use('/api/v1/posts', postRouter);
 // Mount userRouter to that route
 app.use('/api/v1/users', userRouter);
 
-
 //404 
 app.use((req, res)=>{
   res.redirect(301,'http://crefto.studio/');
 })
-
-
 
 
 // =========================================================================================
