@@ -8,8 +8,7 @@ const sendEmail = require('../utils/email');
 const Hogan = require('hogan.js');
 const fs = require('fs');
 
-var emailtemp = fs.readFileSync('./views/emailreset.hjs', 'utf8');
-var emailcomp = Hogan.compile(emailtemp)
+
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -53,6 +52,31 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   // Create the token, the argument given to the signToken function is the payload so the data we want to store inside the token
   createSendToken(newUser, 201, req, res);
+
+  /// send welcome mail to new user
+
+  let paramters ={
+    user_firstname :req.body.name
+  }
+
+  try {
+    var emailtemp = fs.readFileSync('./views/welcome.hjs', 'utf8');
+    var emailcomp = Hogan.compile(emailtemp)
+
+    await sendEmail({
+       email: req.body.email,
+       subject: 'Welcome | Crefto Studio',
+       html: emailcomp.render(paramters)
+     });
+  
+  } catch (err) {
+    return next(
+      new AppError('There was an error sending the email. Try again later!'),
+      500
+    );
+  }
+
+
 });
 //////////////////////////////////////////////////////////  login ////////////////////////////////////////////
 exports.login = catchAsync(async (req, res, next) => {
@@ -163,6 +187,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 
   try {
+    var emailtemp = fs.readFileSync('./views/emailreset.hjs', 'utf8');
+    var emailcomp = Hogan.compile(emailtemp)
+
     await sendEmail({
        email: user.email,
        subject: 'Account Recovery - Reset Password | Crefto Studio',
