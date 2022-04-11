@@ -68,11 +68,7 @@ app.use((req, res, next) => {
 
 // Serve static files in public folder(ex: home.html)
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/css',express.static(path.join(__dirname, 'public/css')));
-app.use('/fonts',express.static(path.join(__dirname, 'public/fonts')));
-app.use('/js',express.static(path.join(__dirname, 'public/js')));
-app.use('/vendor',express.static(path.join(__dirname, 'public/vendor')));
-app.use('/images',express.static(path.join(__dirname, 'public/images')));
+
 
 
 
