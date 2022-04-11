@@ -36,8 +36,7 @@ const sendEmail = async options => {
     from: `Crefto Accounts <${process.env.EMAIL_FROM}`,
     to: options.email,
     subject: options.subject,
-    text: options.message
-    // html:
+    html: options.html
   };
 
   // 3) Actually send the email

@@ -5,6 +5,11 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
+const Hogan = require('hogan.js');
+const fs = require('fs');
+
+var emailtemp = fs.readFileSync('./views/emailreset.hjs', 'utf8');
+var emailcomp = Hogan.compile(emailtemp)
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -151,22 +156,18 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  // user.message(`Forot your password? Submit a PATCH request with your new password and
-  // passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this
-  // email!`);
-
-  // el 7eta di momkn tet3ml f el front w nshlha mn hna
-  const message = `Password Recovery Token Valid For 10 Min Only:\n\n${resetURL}.
-   \nIf you didn't forget your password, please ignore this email!`;
+    
+  let paramters ={
+    confirm_link:resetURL,
+    user_firstname :user.name
+  }
 
   try {
     await sendEmail({
-      email: user.email,
-      subject: 'Account Recovery - Reset Password | Crefto Studio',
-      message
-    });
-    // await new Email(user, resetURL).sendPasswordReset();
-
+       email: user.email,
+       subject: 'Account Recovery - Reset Password | Crefto Studio',
+       html: emailcomp.render(paramters)
+     });
     res.status(200).json({
       status: 'success',
       message: 'Token sent to email!'
