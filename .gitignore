@@ -106,5 +106,11 @@ dist
 #ignore configre enviroment file 
 *.env
 
+#ignore eslint file
 .eslintrc.json
+
+#ignore prettierrc 
 .prettierrc
+
+#ignore vs code configration 
+.vscode 
