@@ -1,3 +1,2 @@
 # Crefto-JS-Back-Core
-Crefto studio
-mohamed 
+Crefto studio 
