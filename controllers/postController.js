@@ -3,6 +3,7 @@ const sharp = require('sharp');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const Post = require('../models/postModel');
+const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 
 const multerStorage = multer.memoryStorage();
@@ -58,6 +59,9 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
   if (!req.body.user) req.body.user = req.user.id;
 
+  //get the user with this user id
+  const user = await User.findById(req.user.id);
+
   const newPost = await Post.create({
     name: req.body.name,
     type: req.body.type,
@@ -66,6 +70,10 @@ exports.createPost = catchAsync(async (req, res, next) => {
     postImg: req.file.filename,
     user: req.user.id
   });
+
+  //adds a post to the front of the array of posts,
+  user.posts.push(newPost);
+  user.save();
 
   res.status(201).json({
     status: 'success',
@@ -76,7 +84,9 @@ exports.createPost = catchAsync(async (req, res, next) => {
 });
 
 exports.getPost = catchAsync(async (req, res, next) => {
-  const post = await Post.findById(req.params.id).populate('reviews');
+  const post = await Post.findById(req.params.id);
+    // .populate('reviews');
+    // .populate({ path: 'user', select: 'name' });
 
   if (!post) {
     return next(new AppError('No post found with that ID', 404));
