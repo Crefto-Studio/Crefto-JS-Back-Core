@@ -1,6 +1,7 @@
 const express = require('express');
 const postController = require('../controllers/postController');
 const authController = require('../controllers/authController');
+const commentController = require('../controllers/commentController');
 
 // Create a router for post routes
 const router = express.Router();
@@ -24,5 +25,16 @@ router
   .get(postController.getPost)
   .patch(authController.protect, postController.updatePost)
   .delete(authController.protect, postController.deletePost);
+
+//Comments Routes
+router
+  .route('/:postId/comments')
+  .post(authController.protect, commentController.createComment)
+  .get(commentController.getAllComments);
+
+router
+  .route('/:postId/:commentId')
+  .patch(authController.protect, commentController.updateComment)
+  .delete(authController.protect, commentController.deleteComment);
 
 module.exports = router;

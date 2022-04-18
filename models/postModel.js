@@ -44,7 +44,8 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: [true, 'An post must have a photo']
   },
-  slug: String
+  slug: String,
+  comments: [{ type: mongoose.Schema.ObjectId, ref: 'Comment' }]
 });
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
@@ -53,7 +54,7 @@ postSchema.pre('save', function(next) {
   next();
 });
 
-postSchema.pre('/^find/', function(next) {
+postSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
     select: 'name'
