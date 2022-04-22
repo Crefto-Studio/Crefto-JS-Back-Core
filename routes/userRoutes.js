@@ -4,6 +4,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false})
 
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const satisficationController = require('../controllers/satisficationController');
 
 // Create a router for user routes
 const router = express.Router();
@@ -48,10 +49,19 @@ router
   .get(userController.getAllUsers)
   .post(userController.createUser);
 
+
+  
+router
+.route('/sats')
+.get(satisficationController.getAllSats)
+.post(authController.protect,satisficationController.createSats);
+
+
 router
   .route('/:id')
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
+
 
 module.exports = router;
