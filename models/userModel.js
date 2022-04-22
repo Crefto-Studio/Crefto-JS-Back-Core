@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     required: [true, 'Please tell us your name!']
   },
+
   email: {
     type: String,
     trim: true,
@@ -17,15 +18,72 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
+
   photo: {
     type: String,
     default: 'default.jpg'
   },
+
   role: {
+    required: false,
     type: String,
     enum: ['user', 'business-Account', 'admin'],
     default: 'user'
   },
+
+  birthday: {
+    required: false,
+    type:Date,
+    default: undefined
+  },
+
+  regdate:{
+    type:Date,
+    default:Date.now()
+  },
+
+  phone: {
+    required: false,
+    type:String,
+    validate : [validator.isMobilePhone, 'please provide a valid phone'],
+    default:undefined
+  },
+
+  gender:{
+    required: false,
+    type: String,
+    enum: ['male', 'female', 'PNTS'],
+    default:undefined
+  },
+
+  facebook:{
+    required: false,
+    type:String,
+    default: undefined,
+    validate : [validator.isURL,'please provide a valid url']  
+  },
+
+  address:{
+    required: false,
+    type:String,
+    default: undefined
+  },
+
+  bio: {
+    required: false,
+
+    type:String,
+    default: undefined
+  },
+
+  interest: {
+    required: false,
+    type: String,
+    default: undefined
+  },
+
+
+  
   password: {
     type: String,
     required: [true, 'Please provide a valid password'],

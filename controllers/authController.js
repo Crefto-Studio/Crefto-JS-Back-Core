@@ -47,7 +47,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role
   });
 
   // Create the token, the argument given to the signToken function is the payload so the data we want to store inside the token
