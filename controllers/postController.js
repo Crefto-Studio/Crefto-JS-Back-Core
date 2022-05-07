@@ -85,8 +85,8 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
 exports.getPost = catchAsync(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-    // .populate('reviews');
-    // .populate({ path: 'user', select: 'name' });
+  // .populate('reviews');
+  // .populate({ path: 'user', select: 'name' });
 
   if (!post) {
     return next(new AppError('No post found with that ID', 404));
@@ -94,6 +94,7 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: post.likes.length,
     data: {
       post
     },
@@ -125,6 +126,7 @@ exports.updatePost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: post.likes.length,
     data: {
       post
     }
@@ -155,8 +157,62 @@ exports.search = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: result.likes.length,
     data: {
       result
     }
   });
+});
+
+exports.like = catchAsync(async (req, res, next) => {
+  //1) find post ID
+  const post = await Post.findById(req.params.postId);
+  if (!post) {
+    return next(new AppError('No post found with that ID', 404));
+  }
+  //2) check if current user liked this post or not
+  //3) if no -> like post
+  if (!post.likes.includes(req.user.id)) {
+    const likedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $push: { likes: req.user.id }
+      },
+      {
+        // The new updated document is the one that will be returned
+        new: true,
+        // Each time we update the document the validators that we specified in the schema will run again
+        runValidators: true
+      }
+    );
+    res.status(200).json({
+      status: 'success',
+      likes: likedPost.likes.length,
+      data: {
+        post: likedPost
+      }
+    });
+  }
+  //4) if yes -> unlike post
+  else {
+    const UnLikedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $pull: { likes: req.user.id }
+      },
+      {
+        // The new updated document is the one that will be returned
+        new: true,
+        // Each time we update the document the validators that we specified in the schema will run again
+        runValidators: true
+      }
+    );
+    res.status(200).json({
+      status: 'success',
+      likes: UnLikedPost.likes.length,
+      data: {
+        post: UnLikedPost
+      }
+    });
+  }
 });

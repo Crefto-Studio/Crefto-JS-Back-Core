@@ -37,4 +37,7 @@ router
   .patch(authController.protect, commentController.updateComment)
   .delete(authController.protect, commentController.deleteComment);
 
+//like and unlike a post
+router.route('/:postId/like').put(authController.protect, postController.like);
+
 module.exports = router;
