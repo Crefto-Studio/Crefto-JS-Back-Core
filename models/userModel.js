@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'business-Account', 'admin'],
     default: 'user'
   },
+  interest: {
+    required: false,
+    type: String,
+    default: undefined
+  },
   password: {
     type: String,
     required: [true, 'Please provide a valid password'],

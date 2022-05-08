@@ -14,6 +14,10 @@ const commentSchema = new mongoose.Schema(
     authorName: {
       type: String,
       required: [true, 'A comment must have an author name']
+    },
+    authorPhoto: {
+      type: String,
+      required: [true, 'A comment must have an author photo']
     }
   },
   { timestamps: true }
