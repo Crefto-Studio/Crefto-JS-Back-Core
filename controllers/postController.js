@@ -3,7 +3,6 @@ const sharp = require('sharp');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const Post = require('../models/postModel');
-const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 
 const multerStorage = multer.memoryStorage();
@@ -59,9 +58,6 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
   if (!req.body.user) req.body.user = req.user.id;
 
-  //get the user with this user id
-  const user = await User.findById(req.user.id);
-
   const newPost = await Post.create({
     name: req.body.name,
     type: req.body.type,
@@ -70,10 +66,6 @@ exports.createPost = catchAsync(async (req, res, next) => {
     postImg: req.file.filename,
     user: req.user.id
   });
-
-  //adds a post to the front of the array of posts,
-  user.posts.push(newPost);
-  user.save();
 
   res.status(201).json({
     status: 'success',
@@ -108,6 +100,7 @@ exports.getMyPosts = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    results: posts.length,
     data: posts
   });
 });
