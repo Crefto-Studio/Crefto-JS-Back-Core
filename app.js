@@ -47,7 +47,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 //set security http requist
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 // data sanatization against no sql quiress
 app.use(mongoSanitize());
 // data sanatization against xss
@@ -63,6 +63,12 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
+
+// allow node corp 
+app.use(function (req, res, next) {
+  res.setHeader('Cross-Origin-Resource-Policy', '*')
+  next()
+})
 
 
 
