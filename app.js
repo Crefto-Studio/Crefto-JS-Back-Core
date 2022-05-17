@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 // rate limit funcation
 const limiter = rateLimit({
-  max: 100,
+  max: 10000,
   windowMS: 60 * 60 * 1000,
   message: 'To manny request from this ip, please try again later'
 });
