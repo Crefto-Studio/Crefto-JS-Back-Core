@@ -3,7 +3,6 @@ const sharp = require('sharp');
 const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const Post = require('../models/postModel');
-const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 
 const multerStorage = multer.memoryStorage();
@@ -59,9 +58,6 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
   if (!req.body.user) req.body.user = req.user.id;
 
-  //get the user with this user id
-  const user = await User.findById(req.user.id);
-
   const newPost = await Post.create({
     name: req.body.name,
     type: req.body.type,
@@ -70,10 +66,6 @@ exports.createPost = catchAsync(async (req, res, next) => {
     postImg: req.file.filename,
     user: req.user.id
   });
-
-  //adds a post to the front of the array of posts,
-  user.posts.push(newPost);
-  user.save();
 
   res.status(201).json({
     status: 'success',
@@ -85,8 +77,8 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
 exports.getPost = catchAsync(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
-    // .populate('reviews');
-    // .populate({ path: 'user', select: 'name' });
+  // .populate('reviews');
+  // .populate({ path: 'user', select: 'name' });
 
   if (!post) {
     return next(new AppError('No post found with that ID', 404));
@@ -94,6 +86,7 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: post.likes.length,
     data: {
       post
     },
@@ -107,6 +100,7 @@ exports.getMyPosts = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    results: posts.length,
     data: posts
   });
 });
@@ -125,6 +119,7 @@ exports.updatePost = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: post.likes.length,
     data: {
       post
     }
@@ -155,8 +150,62 @@ exports.search = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    likesNumber: result.likes.length,
     data: {
       result
     }
   });
+});
+
+exports.like = catchAsync(async (req, res, next) => {
+  //1) find post ID
+  const post = await Post.findById(req.params.postId);
+  if (!post) {
+    return next(new AppError('No post found with that ID', 404));
+  }
+  //2) check if current user liked this post or not
+  //3) if no -> like post
+  if (!post.likes.includes(req.user.id)) {
+    const likedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $push: { likes: req.user.id }
+      },
+      {
+        // The new updated document is the one that will be returned
+        new: true,
+        // Each time we update the document the validators that we specified in the schema will run again
+        runValidators: true
+      }
+    );
+    res.status(200).json({
+      status: 'success',
+      likes: likedPost.likes.length,
+      data: {
+        post: likedPost
+      }
+    });
+  }
+  //4) if yes -> unlike post
+  else {
+    const UnLikedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $pull: { likes: req.user.id }
+      },
+      {
+        // The new updated document is the one that will be returned
+        new: true,
+        // Each time we update the document the validators that we specified in the schema will run again
+        runValidators: true
+      }
+    );
+    res.status(200).json({
+      status: 'success',
+      likes: UnLikedPost.likes.length,
+      data: {
+        post: UnLikedPost
+      }
+    });
+  }
 });

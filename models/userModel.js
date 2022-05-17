@@ -81,9 +81,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: undefined
   },
-
-
-  
   password: {
     type: String,
     required: [true, 'Please provide a valid password'],
@@ -103,8 +100,7 @@ const userSchema = new mongoose.Schema({
         return el === this.password;
       },
       message: 'Passwords are not the same!'
-    },
-    posts: [{ type: mongoose.Schema.ObjectId, ref: 'Post' }]
+    }
   },
   passwordChangedAt: Date,
 

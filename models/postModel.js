@@ -45,7 +45,8 @@ const postSchema = new mongoose.Schema({
     required: [true, 'An post must have a photo']
   },
   slug: String,
-  comments: [{ type: mongoose.Schema.ObjectId, ref: 'Comment' }]
+  comments: [{ type: mongoose.Schema.ObjectId, ref: 'Comment' }],
+  likes: [{ type: mongoose.Schema.ObjectId, ref: 'User' }]
 });
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()

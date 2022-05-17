@@ -10,6 +10,8 @@ exports.createComment = catchAsync(async (req, res, next) => {
   if (!req.body.user) req.body.user = req.user.id;
   //TODO: get user from its id, then get its name
   const authorName = await User.findById(req.user.id, '-_id name');
+  const authorPhoto = await User.findById(req.user.id, '-_id photo');
+  // return console.log(authorName, authorPhoto);
   // return console.log(authorName);
   //get the post with this postId
   const post = await Post.findById(req.params.postId);
@@ -20,7 +22,8 @@ exports.createComment = catchAsync(async (req, res, next) => {
     content: req.body.content,
     author: req.user.id,
     //TODO: add name of user
-    authorName: authorName
+    authorName: authorName,
+    authorPhoto: authorPhoto
   });
   //adds an comment to the front of the array,
   post.comments.unshift(newComment);
