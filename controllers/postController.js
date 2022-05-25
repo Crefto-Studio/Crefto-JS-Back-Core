@@ -4,6 +4,7 @@ const AppError = require('../utils/appError');
 const APIFeatures = require('../utils/apiFeatures');
 const Post = require('../models/postModel');
 const catchAsync = require('../utils/catchAsync');
+const {uploadFile} = require('../utils/s3')
 
 const multerStorage = multer.memoryStorage();
 
@@ -27,11 +28,14 @@ exports.resizePostPhoto = catchAsync(async (req, res, next) => {
 
   req.file.filename = `post-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
+  req.file.buffer = await sharp(req.file.buffer)
     .resize(1000, 1000)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/posts/${req.file.filename}`);
+    .toBuffer();
+
+    await uploadFile(req.file,'posts')
+
 
   next();
 });
