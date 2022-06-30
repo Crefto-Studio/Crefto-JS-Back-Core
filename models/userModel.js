@@ -33,46 +33,46 @@ const userSchema = new mongoose.Schema({
 
   birthday: {
     required: false,
-    type:Date,
+    type: Date,
     default: undefined
   },
 
-  regdate:{
-    type:Date,
-    default:Date.now()
+  regdate: {
+    type: Date,
+    default: Date.now()
   },
 
   phone: {
     required: false,
-    type:String,
-    validate : [validator.isMobilePhone, 'please provide a valid phone'],
-    default:undefined
+    type: String,
+    validate: [validator.isMobilePhone, 'please provide a valid phone'],
+    default: undefined
   },
 
-  gender:{
+  gender: {
     required: false,
     type: String,
     enum: ['male', 'female', 'PNTS'],
-    default:undefined
+    default: undefined
   },
 
-  facebook:{
+  facebook: {
     required: false,
-    type:String,
+    type: String,
     default: undefined,
-    validate : [validator.isURL,'please provide a valid url']  
+    validate: [validator.isURL, 'please provide a valid url']
   },
 
-  address:{
+  address: {
     required: false,
-    type:String,
+    type: String,
     default: undefined
   },
 
   bio: {
     required: false,
 
-    type:String,
+    type: String,
     default: undefined
   },
 

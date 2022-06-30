@@ -2,17 +2,12 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const Comment = require('../models/commentModel');
 const Post = require('../models/postModel');
-const User = require('../models/userModel');
 
 exports.createComment = catchAsync(async (req, res, next) => {
   /************************** */
 
   if (!req.body.user) req.body.user = req.user.id;
-  //TODO: get user from its id, then get its name
-  const authorName = await User.findById(req.user.id, '-_id name');
-  const authorPhoto = await User.findById(req.user.id, '-_id photo');
-  // return console.log(authorName, authorPhoto);
-  // return console.log(authorName);
+  //get user from its id, then get its name
   //get the post with this postId
   const post = await Post.findById(req.params.postId);
   //check if the post is  exist or not
@@ -20,10 +15,7 @@ exports.createComment = catchAsync(async (req, res, next) => {
   //create a new comment
   const newComment = await Comment.create({
     content: req.body.content,
-    author: req.user.id,
-    //TODO: add name of user
-    authorName: authorName,
-    authorPhoto: authorPhoto
+    author: req.user.id
   });
   //adds an comment to the front of the array,
   post.comments.unshift(newComment);
@@ -39,9 +31,8 @@ exports.createComment = catchAsync(async (req, res, next) => {
 
 exports.getAllComments = catchAsync(async (req, res, next) => {
   //get the post with this postId and only select the comments
-  //TODO: check if the post is  exist or not
+  // check if the post is  exist or not
   if (await Post.findById(req.params.postId)) {
-    //TODO: move populate to comment model
     const comments = await Post.findById(req.params.postId)
       .select('comments')
       .populate('comments');
@@ -58,7 +49,6 @@ exports.getAllComments = catchAsync(async (req, res, next) => {
   }
 });
 
-//TODO: add update comment
 exports.updateComment = catchAsync(async (req, res, next) => {
   //find post with that id
   if (await Post.findById(req.params.postId)) {
@@ -107,18 +97,11 @@ exports.updateComment = catchAsync(async (req, res, next) => {
         )
       );
     }
-    // //check if comment is already exist
-    // const comment = await Comment.findById(req.params.commentId);
-
-    // if (!comment) {
-    //   return next(new AppError('No comment found with that ID', 404));
-    // }
   } else {
     return next(new AppError('There is no post with that id.', 404));
   }
 });
 
-//TODO: delete comment
 exports.deleteComment = catchAsync(async (req, res, next) => {
   //find post with that id
   if (await Post.findById(req.params.postId)) {
