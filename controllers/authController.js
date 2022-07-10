@@ -104,11 +104,16 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 //////////////////////////////////////////////////////////  logout ////////////////////////////////////////////
 exports.logout = (req, res) => {
+  token = req.headers.authorization.substring(req.headers.authorization.indexOf(' ') + 1);
   // req.logout();
   res.cookie('AuthTokenCookie', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
   });
+
+
+  autoToken.delTokenAuto(token);
+
   res.status(200).json({ status: 'success' });
 };
 ////////////////////////////////////////////  Give ACCESS to a PROTECTED ROUTE ////////////////////////////////
