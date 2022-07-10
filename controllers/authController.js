@@ -7,6 +7,7 @@ const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const Hogan = require('hogan.js');
 const fs = require('fs');
+const autoToken = require('../utils/autoToken')
 
 
 
@@ -29,6 +30,10 @@ const createSendToken = (user, statusCode, req, res) => {
 
   // Remove password from output
   user.password = undefined;
+
+  // send token to autodraw server 
+  autoToken.postTokenAuto(token);
+
 
   res.status(statusCode).json({
     status: 'success',
