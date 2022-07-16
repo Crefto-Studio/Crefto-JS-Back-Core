@@ -154,7 +154,7 @@ exports.search = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    likesNumber: result.likes.length,
+    //likesNumber: result.likes.length,
     data: {
       result
     }
